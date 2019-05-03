@@ -6,6 +6,8 @@ import torchvision.transforms as transforms
 import torch.nn.functional as F
 import torch.optim as optim
 
+from tqdm import tqdm
+
 ## load mnist dataset
 use_cuda = torch.cuda.is_available()
 
@@ -31,6 +33,7 @@ test_loader = torch.utils.data.DataLoader(
 
 print('==>>> total trainning batch number: {}'.format(len(train_loader)))
 print('==>>> total testing batch number: {}'.format(len(test_loader)))
+
 
 class LeNet(nn.Module):
     def __init__(self):
@@ -68,7 +71,8 @@ criterion = nn.CrossEntropyLoss()
 for epoch in range(10):
     model.train()
     ave_loss = 0
-    for batch_idx, (x, target) in enumerate(train_loader):
+    loader = tqdm(train_loader, total=len(train_loader))
+    for batch_idx, (x, target) in enumerate(loader):
         optimizer.zero_grad()
         if use_cuda:
             x, target = x.cuda(), target.cuda()
@@ -85,7 +89,8 @@ for epoch in range(10):
     correct_cnt, ave_loss = 0, 0
     total_cnt = 0
     model.eval()
-    for batch_idx, (x, target) in enumerate(test_loader):
+    loader = tqdm(test_loader, total=len(test_loader))
+    for batch_idx, (x, target) in enumerate(loader):
         if use_cuda:
             x, target = x.cuda(), target.cuda()
         out = model(x)[0]
@@ -103,4 +108,3 @@ for epoch in range(10):
 
 torch.save(model.state_dict(), model.name())
 torch.save(model, model.name() + '.pth')
-
