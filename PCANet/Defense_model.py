@@ -16,7 +16,7 @@ trans = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), 
 train_set = dset.MNIST(root=root, train=True, transform=trans, download=True)
 test_set = dset.MNIST(root=root, train=False, transform=trans, download=True)
 
-batch_size = 100
+batch_size = 128
 
 train_loader = torch.utils.data.DataLoader(
     dataset=train_set,
@@ -34,27 +34,44 @@ print('==>>> total testing batch number: {}'.format(len(test_loader)))
 class DefenseNet(nn.Module):
     def __init__(self):
         super(DefenseNet, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5, 1)
-        self.conv2 = nn.Conv2d(20, 50, 5, 1)
-        self.fc1 = nn.Linear(4 * 4 * 50, 500)
-        self.ae1 = nn.Linear(500, 128)
-        self.ae2 = nn.Linear(128, 64)
-        self.ae3 = nn.Linear(64, 128)
-        self.ae4 = nn.Linear(128, 500)
-        self.fc2 = nn.Linear(500, 10)
+
+        self.conv1 = nn.Conv2d(1, 32, 3)
+        self.conv2 = nn.Conv2d(32, 32, 3)
+        self.conv3 = nn.Conv2d(32, 64, 3)
+        self.conv4 = nn.Conv2d(64, 64, 3)
+
+        self.fc1 = nn.Linear(1024, 200)
+        self.dropout1 = nn.Dropout(0.5, inplace=True)
+        self.fc2 = nn.Linear(200, 200)
+        self.dropout2 = nn.Dropout(0.5, inplace=True)
+
+        self.ae1 = nn.Linear(200, 100)
+        self.ae2 = nn.Linear(100, 50)
+        self.ae3 = nn.Linear(50, 100)
+        self.ae4 = nn.Linear(100, 200)
+
+        self.fc3 = nn.Linear(200, 10)
 
     def forward(self, x):
         x = F.relu(self.conv1(x))
-        x = F.max_pool2d(x, 2, 2)
         x = F.relu(self.conv2(x))
         x = F.max_pool2d(x, 2, 2)
-        x = x.view(-1, 4 * 4 * 50)
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        x = F.max_pool2d(x, 2, 2)
+
+        x = x.view(x.size(0), -1)  # flatten
         x = F.relu(self.fc1(x))
+        x = self.dropout1(x)
+        x = F.relu(self.fc2(x))
+        x = self.dropout2(x)
+
         x = torch.tanh(self.ae1(x))
         x = self.ae2(x)
         x = torch.tanh(self.ae3(x))
         x = F.relu(self.ae4(x))
-        x = self.fc2(x)
+
+        x = self.fc3(x)
         return x
 
 ## training

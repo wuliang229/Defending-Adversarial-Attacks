@@ -8,7 +8,7 @@ np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
 
 data = np.load('res.npy')
 use_cuda = torch.cuda.is_available()
-num_epochs = 500
+num_epochs = 10000
 batch_size = 128
 learning_rate = 1e-3
 
@@ -20,13 +20,13 @@ class autoencoder(nn.Module):
     def __init__(self):
         super(autoencoder, self).__init__()
         self.encoder = nn.Sequential(
-            nn.Linear(500, 128),
+            nn.Linear(200, 100),
             nn.Tanh(),
-            nn.Linear(128, 64))
+            nn.Linear(100, 50))
         self.decoder = nn.Sequential(
-            nn.Linear(64, 128),
+            nn.Linear(50, 100),
             nn.Tanh(),
-            nn.Linear(128, 500),
+            nn.Linear(100, 200),
             nn.ReLU())
 
     def forward(self, x):
@@ -51,16 +51,16 @@ for epoch in range(num_epochs):
         # ===================forward=====================
         output = model(features)
         loss = criterion(output, features)
-        tooutput = output[0].detach().numpy()
-        tofeatures = features[0].detach().numpy()
+        tooutput = output[0].detach().cpu().numpy()
+        tofeatures = features[0].detach().cpu().numpy()
         # ===================backward====================
         loss.backward()
         optimizer.step()
     # ===================log========================
     print('epoch [{}/{}], loss:{:.4f}'
           .format(epoch + 1, num_epochs, loss.data.item()))
-    print(tofeatures[:10])
-    print(tooutput[:10])
+    # print(tofeatures[:10])
+    # print(tooutput[:10])
     print('distance: ', np.linalg.norm(tofeatures-tooutput))
     print('---------')
 
