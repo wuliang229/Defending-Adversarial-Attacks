@@ -45,10 +45,15 @@ class DefenseNet(nn.Module):
         self.fc2 = nn.Linear(200, 200)
         self.dropout2 = nn.Dropout(0.5, inplace=True)
 
-        self.ae1 = nn.Linear(200, 100)
-        self.ae2 = nn.Linear(100, 50)
-        self.ae3 = nn.Linear(50, 100)
-        self.ae4 = nn.Linear(100, 200)
+        self.ae1 = nn.Linear(200, 128)
+        self.ae2 = nn.Linear(128, 64)
+        self.ae3 = nn.Linear(64, 32)
+        self.ae4 = nn.Linear(32, 32)
+        self.ae5 = nn.Linear(32, 32)
+        self.ae6 = nn.Linear(32, 64)
+        self.ae7 = nn.Linear(64, 128)
+        self.ae8 = nn.Linear(128, 200)
+
 
         self.fc3 = nn.Linear(200, 10)
 
@@ -67,15 +72,19 @@ class DefenseNet(nn.Module):
         x = self.dropout2(x)
 
         x = torch.tanh(self.ae1(x))
-        x = self.ae2(x)
+        x = torch.tanh(self.ae2(x))
         x = torch.tanh(self.ae3(x))
-        x = F.relu(self.ae4(x))
+        x = self.ae4(x)
+        x = torch.tanh(self.ae5(x))
+        x = torch.tanh(self.ae6(x))
+        x = torch.tanh(self.ae7(x))
+        x = F.relu(self.ae8(x))
 
         x = self.fc3(x)
         return x
 
 ## training
-model = torch.load('DefenseNet.pth')
+model = torch.load('DefenseNet.pth', map_location='cpu')
 
 if use_cuda:
     model = model.cuda()

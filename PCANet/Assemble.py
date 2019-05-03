@@ -44,19 +44,28 @@ class autoencoder(nn.Module):
     def __init__(self):
         super(autoencoder, self).__init__()
         self.encoder = nn.Sequential(
-            nn.Linear(200, 100),
+            nn.Linear(200, 128),
             nn.Tanh(),
-            nn.Linear(100, 50))
+            nn.Linear(128, 64),
+            nn.Tanh(),
+            nn.Linear(64, 32),
+            nn.Tanh(),
+            nn.Linear(32, 32))
         self.decoder = nn.Sequential(
-            nn.Linear(50, 100),
+            nn.Linear(32, 32),
             nn.Tanh(),
-            nn.Linear(100, 200),
+            nn.Linear(32, 64),
+            nn.Tanh(),
+            nn.Linear(64, 128),
+            nn.Tanh(),
+            nn.Linear(128, 200),
             nn.ReLU())
 
     def forward(self, x):
         x = self.encoder(x)
         x = self.decoder(x)
         return x
+
 
 class DefenseNet(nn.Module):
     def __init__(self):
@@ -72,10 +81,15 @@ class DefenseNet(nn.Module):
         self.fc2 = nn.Linear(200, 200)
         self.dropout2 = nn.Dropout(0.5, inplace=True)
 
-        self.ae1 = nn.Linear(200, 100)
-        self.ae2 = nn.Linear(100, 50)
-        self.ae3 = nn.Linear(50, 100)
-        self.ae4 = nn.Linear(100, 200)
+        self.ae1 = nn.Linear(200, 128)
+        self.ae2 = nn.Linear(128, 64)
+        self.ae3 = nn.Linear(64, 32)
+        self.ae4 = nn.Linear(32, 32)
+        self.ae5 = nn.Linear(32, 32)
+        self.ae6 = nn.Linear(32, 64)
+        self.ae7 = nn.Linear(64, 128)
+        self.ae8 = nn.Linear(128, 200)
+
 
         self.fc3 = nn.Linear(200, 10)
 
@@ -94,9 +108,13 @@ class DefenseNet(nn.Module):
         x = self.dropout2(x)
 
         x = torch.tanh(self.ae1(x))
-        x = self.ae2(x)
+        x = torch.tanh(self.ae2(x))
         x = torch.tanh(self.ae3(x))
-        x = F.relu(self.ae4(x))
+        x = self.ae4(x)
+        x = torch.tanh(self.ae5(x))
+        x = torch.tanh(self.ae6(x))
+        x = torch.tanh(self.ae7(x))
+        x = F.relu(self.ae8(x))
 
         x = self.fc3(x)
         return x
@@ -124,11 +142,19 @@ dfnet.ae1.weight = torch.nn.Parameter(model_ae.state_dict()['encoder.0.weight'])
 dfnet.ae1.bias = torch.nn.Parameter(model_ae.state_dict()['encoder.0.bias'])
 dfnet.ae2.weight = torch.nn.Parameter(model_ae.state_dict()['encoder.2.weight'])
 dfnet.ae2.bias = torch.nn.Parameter(model_ae.state_dict()['encoder.2.bias'])
+dfnet.ae3.weight = torch.nn.Parameter(model_ae.state_dict()['encoder.4.weight'])
+dfnet.ae3.bias = torch.nn.Parameter(model_ae.state_dict()['encoder.4.bias'])
+dfnet.ae4.weight = torch.nn.Parameter(model_ae.state_dict()['encoder.6.weight'])
+dfnet.ae4.bias = torch.nn.Parameter(model_ae.state_dict()['encoder.6.bias'])
 
-dfnet.ae3.weight = torch.nn.Parameter(model_ae.state_dict()['decoder.0.weight'])
-dfnet.ae3.bias = torch.nn.Parameter(model_ae.state_dict()['decoder.0.bias'])
-dfnet.ae4.weight = torch.nn.Parameter(model_ae.state_dict()['decoder.2.weight'])
-dfnet.ae4.bias = torch.nn.Parameter(model_ae.state_dict()['decoder.2.bias'])
+dfnet.ae5.weight = torch.nn.Parameter(model_ae.state_dict()['decoder.0.weight'])
+dfnet.ae5.bias = torch.nn.Parameter(model_ae.state_dict()['decoder.0.bias'])
+dfnet.ae6.weight = torch.nn.Parameter(model_ae.state_dict()['decoder.2.weight'])
+dfnet.ae6.bias = torch.nn.Parameter(model_ae.state_dict()['decoder.2.bias'])
+dfnet.ae7.weight = torch.nn.Parameter(model_ae.state_dict()['decoder.4.weight'])
+dfnet.ae7.bias = torch.nn.Parameter(model_ae.state_dict()['decoder.4.bias'])
+dfnet.ae8.weight = torch.nn.Parameter(model_ae.state_dict()['decoder.6.weight'])
+dfnet.ae8.bias = torch.nn.Parameter(model_ae.state_dict()['decoder.6.bias'])
 
 torch.save(dfnet, 'DefenseNet.pth')
 
