@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9a7d2f75-2423-4300-b5a9-da2c460fb196" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/PCANet/Assemble.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCANet/Assemble.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PCANet/DefenseNet.pth" beforeDir="false" afterPath="$PROJECT_DIR$/PCANet/DefenseNet.pth" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PCANet/Defense_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCANet/Defense_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PCANet/Train_Autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCANet/Train_Autoencoder.py" afterDir="false" />
-    </list>
+    <list default="true" id="9a7d2f75-2423-4300-b5a9-da2c460fb196" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,7 +16,7 @@
     <session id="-1150265425">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="2" />
+          <entry key="project.closed" value="3" />
           <entry key="project.open.time.1" value="1" />
           <entry key="project.open.time.3" value="1" />
           <entry key="project.open.time.8" value="1" />
@@ -103,8 +98,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCANet/Defense_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="186">
-              <caret line="92" lean-forward="true" selection-start-line="92" selection-end-line="92" />
+            <state relative-caret-position="248">
+              <caret line="95" column="13" lean-forward="true" selection-start-line="95" selection-start-column="13" selection-end-line="95" selection-end-column="13" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -269,7 +264,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32876712" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32876712" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -346,8 +341,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCANet/Defense_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="92" lean-forward="true" selection-start-line="92" selection-end-line="92" />
+        <state relative-caret-position="248">
+          <caret line="95" column="13" lean-forward="true" selection-start-line="95" selection-start-column="13" selection-end-line="95" selection-end-column="13" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
