@@ -66,7 +66,10 @@ def train(loader, file_name, num_epochs, is_student, train_temp = 1):
     model.to(device)
     CE = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max')
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience = 3)
+
+    best_test_accuracy = 0
+
     for epoch in range(num_epochs):
         model.train()
         start = time.time()
@@ -102,10 +105,14 @@ def train(loader, file_name, num_epochs, is_student, train_temp = 1):
         end = time.time()
         print("Epoch {} finished: total time = {} seconds".format(epoch + 1, end - start))
         accuracy = test(model)
+
+        if accuracy > best_test_accuracy:
+            print("Get a better model, saving....")
+            torch.save(model, 'models/' + file_name)
+            best_test_accuracy = accuracy
+
         scheduler.step(accuracy)
 
-
-    torch.save(model.state_dict(), 'models/' + file_name)
     return model
 
 
@@ -141,7 +148,7 @@ def train_distillation(loader, file_name, num_epochs, train_temp = 1):
     new_labels = []
     teacher.eval()
     deterministic_loader = DataLoader(dataset=mnist_trainset, batch_size=batch_size, shuffle=False)
-    
+
     print("Start generating the probabilities as labels")
     for batch_num, (x, target) in enumerate(deterministic_loader):
         x = x.to(device)
@@ -183,7 +190,7 @@ train_loader = DataLoader(dataset=mnist_trainset, batch_size=batch_size, shuffle
 test_loader = DataLoader(dataset=mnist_testset, batch_size=batch_size, shuffle=False)
 
 # Regular training
-train(train_loader, "mnist.pt", num_epochs, False)
+train(train_loader, "LeNet_MNIST.pt", num_epochs, False)
 
 # Distillation training
-train_distillation(train_loader, "mnist_distilled_20.pt", num_epochs, 20)
+train_distillation(train_loader, "LeNet_MNIST_distilled_20.pt", num_epochs, 20)
