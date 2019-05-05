@@ -65,8 +65,12 @@ def train(loader, file_name, num_epochs, is_student, train_temp = 1):
     model = CIFARModel()
     model.to(device)
     CE = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr = 0.001, momentum = 0.9, nesterov = True)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience = 5)
+    optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience = 3)
+
+    best_test_accuracy = 0
+
+
     for epoch in range(num_epochs):
         model.train()
         start = time.time()
@@ -102,10 +106,15 @@ def train(loader, file_name, num_epochs, is_student, train_temp = 1):
         end = time.time()
         print("Epoch {} finished: total time = {} seconds".format(epoch + 1, end - start))
         accuracy = test(model)
+
+        if accuracy > best_test_accuracy:
+            print("Get a better testing accuracy, saving....")
+            torch.save(model, 'models/' + file_name)
+            best_test_accuracy = accuracy
+
+
         scheduler.step(accuracy)
 
-
-    torch.save(model.state_dict(), 'models/' + file_name)
     return model
 
 
@@ -184,7 +193,7 @@ train_loader = DataLoader(dataset=CIFAR_trainset, batch_size=batch_size, shuffle
 test_loader = DataLoader(dataset=CIFAR_testset, batch_size=batch_size, shuffle=False)
 
 # Regular training
-# train(train_loader, "cifar10.pt", 30, False)
+train(train_loader, "LeNet_CIFAR10.pt", 20, False)
 
 # Distillation training
-train_distillation(train_loader, "cifar10_distilled_20.pt", num_epochs, 20)
+train_distillation(train_loader, "LeNet_CIFAR10_distilled_20.pt", num_epochs, 20)
