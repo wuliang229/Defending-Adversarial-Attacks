@@ -124,7 +124,8 @@ class StepNet(nn.Module):
     def name(self):
         return "StepNet"
 
-if __name__ == '__mian__':
+
+if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # params
@@ -160,8 +161,7 @@ if __name__ == '__mian__':
         # training
         model.train()
         train_loss = 0.
-        loader = tqdm(train_loader, total=len(train_loader))
-        for batch_idx, (x, target) in enumerate(loader):
+        for batch_idx, (x, target) in enumerate(train_loader):
             optimizer.zero_grad()
             x, target = x.to(device), target.to(device)
             out = model(x)
@@ -179,9 +179,8 @@ if __name__ == '__mian__':
         model.eval()
         correct_cnt, test_loss = 0, 0
         total_cnt = 0
-        loader = tqdm(test_loader, total=len(test_loader))
         with torch.no_grad():
-            for batch_idx, (x, target) in enumerate(loader):
+            for batch_idx, (x, target) in enumerate(test_loader):
                 x, target = x.to(device), target.to(device)
                 out = model(x)
                 loss = criterion(out, target)
