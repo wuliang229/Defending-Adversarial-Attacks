@@ -1,7 +1,4 @@
 import os
-import sys
-sys.path.append("..")
-
 import copy
 import torch
 import torch.nn as nn
@@ -10,7 +7,7 @@ import torchvision.transforms as transforms
 import torch.optim as optim
 
 from tqdm import tqdm
-from model.models_mnist import *
+from models_mnist import LeNet_ANL
 
 use_cuda = torch.cuda.is_available()
 
@@ -57,7 +54,7 @@ for epoch in range(20):
         loss.backward()
 
         # second iteration
-        out = model(x, noise_factor)[0]
+        out = model(x, noise_factor)
         loss = criterion(out, target)
         loss = loss.mean()
         train_loss += loss.item()
@@ -83,7 +80,7 @@ for epoch in range(20):
             loss = loss.mean()
             test_loss += loss.item()
             _, pred_label = torch.max(out.data, 1)
-            total_cnt += x.data.size()[0]
+            total_cnt += x.data.size()
             correct_cnt += torch.sum(torch.eq(pred_label, target.data)).item()
 
             if (batch_idx + 1) % 100 == 0 or (batch_idx + 1) == len(test_loader):

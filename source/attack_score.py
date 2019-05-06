@@ -1,4 +1,5 @@
 # <---- need to put the model defination input the models_mnist.py file ---->
+import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -7,7 +8,7 @@ from advertorch_examples.utils import get_mnist_test_loader
 from advertorch_examples.utils import _imshow
 from advertorch.attacks import LinfPGDAttack
 import sys
-from ..model.models_mnist import *
+from models_mnist import *
 
 torch.manual_seed(0)
 use_cuda = torch.cuda.is_available()
@@ -37,12 +38,12 @@ def generate_attack_samples(model, cln_data, true_label):
 
 
 # paths
-model_path = sys.argv[1]
-output_path = model_path + '_metrics.txt'
+model_name = sys.argv[1]
+model_path = os.path.join('..', 'model', model_name)
+output_path = os.path.join('..', 'result', model_name + '_metrics.txt')
 print(model_path)
 # load model
 model = torch.load(model_path, map_location='cpu')
-
 
 # generate attack samples
 batch_size = 100
@@ -50,7 +51,6 @@ loader = get_mnist_test_loader(batch_size=batch_size)
 for cln_data, true_label in loader:
     break
 cln_data, true_labels = cln_data.to(device), true_label.to(device)
-
 
 adv_targeted_results, adv_target_labels, adv_untargeted = generate_attack_samples(
     model, cln_data, true_label)

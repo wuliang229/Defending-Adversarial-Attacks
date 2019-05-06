@@ -7,8 +7,7 @@ import torchvision.transforms as transforms
 import torch.optim as optim
 
 from tqdm import tqdm
-
-from model.models_mnist import *
+from models_mnist import LeNet_Block
 
 use_cuda = torch.cuda.is_available()
 
