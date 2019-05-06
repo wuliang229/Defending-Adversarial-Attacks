@@ -196,4 +196,4 @@ test_loader = DataLoader(dataset=CIFAR_testset, batch_size=batch_size, shuffle=F
 train(train_loader, "LeNet_CIFAR10.pt", num_epochs, False)
 
 # Distillation training
-train_distillation(train_loader, "LeNet_CIFAR10_distilled_20.pt", num_epochs, 20)
+# train_distillation(train_loader, "LeNet_CIFAR10_distilled_20.pt", num_epochs, 20)
