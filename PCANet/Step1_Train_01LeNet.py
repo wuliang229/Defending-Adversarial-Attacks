@@ -8,10 +8,15 @@ import torch.nn.functional as F
 import torch.optim as optim
 from tqdm import tqdm
 from torch.autograd import Variable
+use_cuda = torch.cuda.is_available()
+if use_cuda:
+    device = 'cuda'
+else:
+    device = 'cpu'
 
-class LeNet(nn.Module):
+class LeNet01(nn.Module):
     def __init__(self):
-        super(LeNet, self).__init__()
+        super(LeNet01, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3)
         self.conv2 = nn.Conv2d(32, 32, 3)
         self.conv3 = nn.Conv2d(32, 64, 3)
@@ -24,8 +29,9 @@ class LeNet(nn.Module):
         self.fc3 = nn.Linear(200, 10)
 
     def forward(self, x):
-        t = Variable(torch.Tensor([0.5]))  # threshold
-        x = (x > t).float() * 1
+        zeros = torch.zeros_like(x)
+        ones = torch.ones_like(x)
+        x = torch.where(x > 0, zeros, ones)
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
         x = F.max_pool2d(x, 2, 2)
@@ -44,12 +50,11 @@ class LeNet(nn.Module):
         return x, y
 
     def name(self):
-        return "LeNet"
+        return "LeNet01"
 
 
 if __name__ == '__main__':
     ## load mnist dataset
-    use_cuda = torch.cuda.is_available()
     best_loss = 1e4
     root = './data'
     if not os.path.exists(root):
@@ -75,7 +80,7 @@ if __name__ == '__main__':
     print('==>>> total testing batch number: {}'.format(len(test_loader)))
 
     ## training
-    model = LeNet()
+    model = LeNet01()
     if use_cuda:
         model = model.cuda()
 
@@ -131,4 +136,4 @@ if __name__ == '__main__':
 
     # saving
     model.load_state_dict(best_model_wts)
-    torch.save(model, 'LeNet.pth')
+    torch.save(model, 'LeNet01.pth')
