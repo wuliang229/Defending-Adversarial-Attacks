@@ -3,5 +3,6 @@
 .ipynb_checkpoints
 data
 result
+*/.idea/*
 */__pycache__/*
 */.ipynb_checkpoints/*
