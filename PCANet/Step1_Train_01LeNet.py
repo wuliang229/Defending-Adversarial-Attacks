@@ -44,10 +44,9 @@ class LeNet01(nn.Module):
         x = self.dropout1(x)
         x = F.relu(self.fc2(x))
         x = self.dropout2(x)
-        y = x
         x = self.fc3(x)
 
-        return x, y
+        return x
 
     def name(self):
         return "LeNet01"
@@ -96,7 +95,7 @@ if __name__ == '__main__':
             optimizer.zero_grad()
             if use_cuda:
                 x, target = x.cuda(), target.cuda()
-            out = model(x)[0]
+            out = model(x)
             loss = criterion(out, target)
             loss = loss.mean()
             train_loss += loss.item()
@@ -116,7 +115,7 @@ if __name__ == '__main__':
             for batch_idx, (x, target) in enumerate(loader):
                 if use_cuda:
                     x, target = x.cuda(), target.cuda()
-                out = model(x)[0]
+                out = model(x)
                 loss = criterion(out, target)
                 loss = loss.mean()
                 test_loss += loss.item()

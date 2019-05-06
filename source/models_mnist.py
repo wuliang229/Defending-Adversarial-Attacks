@@ -36,10 +36,9 @@ class LeNet01(nn.Module):
         x = self.dropout1(x)
         x = F.relu(self.fc2(x))
         x = self.dropout2(x)
-        y = x
         x = self.fc3(x)
 
-        return x, y
+        return x
 
     def name(self):
         return "LeNet01"
