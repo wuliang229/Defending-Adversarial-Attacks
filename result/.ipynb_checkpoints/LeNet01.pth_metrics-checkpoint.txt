@@ -1,1 +1,0 @@
-cln_acc 1.0000 | defense_acc 1.0000 | defense_rate 1.0000 attack_rate 0.0000
