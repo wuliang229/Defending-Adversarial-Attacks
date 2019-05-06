@@ -1,13 +1,4 @@
-import torch
-from torch import nn
-from torch.autograd import Variable
-m = nn.Threshold(0.1, 20)
-input = Variable(torch.randn([2]), requires_grad = True)
-output = m(input)
-print(input)
-print(output)
-output.backward()
-loss = nn.CrossEntropyLoss(input, output)
-loss.backward()
+a = [0.115, 0.2, 0.275, 0.34, 0.405, 0.48, 0.575, 0.7, 0.84][::-1]
+print(a)
 
 
