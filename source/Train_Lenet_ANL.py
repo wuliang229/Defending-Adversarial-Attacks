@@ -1,4 +1,7 @@
 import os
+import sys
+sys.path.append("..")
+
 import copy
 import torch
 import torch.nn as nn
@@ -7,8 +10,7 @@ import torchvision.transforms as transforms
 import torch.optim as optim
 
 from tqdm import tqdm
-
-from ..model.models_mnist import *
+from model.models_mnist import *
 
 use_cuda = torch.cuda.is_available()
 
@@ -49,7 +51,7 @@ for epoch in range(20):
             x, target = x.cuda(), target.cuda()
 
         # first iteration
-        out = model(x)[0]
+        out = model(x)
         loss = criterion(out, target)
         loss = loss.mean()
         loss.backward()
@@ -76,7 +78,7 @@ for epoch in range(20):
         for batch_idx, (x, target) in enumerate(loader):
             if use_cuda:
                 x, target = x.cuda(), target.cuda()
-            out = model(x)[0]
+            out = model(x)
             loss = criterion(out, target)
             loss = loss.mean()
             test_loss += loss.item()

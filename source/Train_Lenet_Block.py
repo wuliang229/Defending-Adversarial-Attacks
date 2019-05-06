@@ -8,7 +8,7 @@ import torch.optim as optim
 
 from tqdm import tqdm
 
-from ..model.models_mnist import *
+from model.models_mnist import *
 
 use_cuda = torch.cuda.is_available()
 
@@ -46,7 +46,7 @@ for epoch in range(20):
         optimizer.zero_grad()
         if use_cuda:
             x, target = x.cuda(), target.cuda()
-        out = model(x)[0]
+        out = model(x)
         loss = criterion(out, target)
         loss = loss.mean()
         train_loss += loss.item()
@@ -66,7 +66,7 @@ for epoch in range(20):
         for batch_idx, (x, target) in enumerate(loader):
             if use_cuda:
                 x, target = x.cuda(), target.cuda()
-            out = model(x)[0]
+            out = model(x)
             loss = criterion(out, target)
             loss = loss.mean()
             test_loss += loss.item()
