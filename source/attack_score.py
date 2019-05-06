@@ -44,7 +44,12 @@ output_path = os.path.join('..', 'result', model_name + '_metrics.txt')
 print(model_path)
 # load model
 model = torch.load(model_path, map_location='cpu')
-
+model_2 = None
+if len(sys.argv) > 2:
+    test_model_name = sys.argv[2]
+    model_2_path = os.path.join('..', 'model', test_model_name)
+    model_2 = torch.load(model_2_path, map_location='cpu')
+    print('testing results on '+model_2_path)
 # generate attack samples
 batch_size = 100
 loader = get_mnist_test_loader(batch_size=batch_size)
@@ -52,8 +57,12 @@ for cln_data, true_label in loader:
     break
 cln_data, true_labels = cln_data.to(device), true_label.to(device)
 
-adv_targeted_results, adv_target_labels, adv_untargeted = generate_attack_samples(
-    model, cln_data, true_label)
+if model_2 is not None:
+    adv_targeted_results, adv_target_labels, adv_untargeted = generate_attack_samples(
+        model_2, cln_data, true_label)
+else:
+    adv_targeted_results, adv_target_labels, adv_untargeted = generate_attack_samples(
+        model, cln_data, true_label)
 
 defense_cln_acc = 0.0
 defense_acc = 0.0
