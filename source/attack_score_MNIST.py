@@ -15,8 +15,8 @@ from models_mnist import *
 
 torch.manual_seed(0)
 use_cuda = torch.cuda.is_available()
-# device = torch.device("cuda" if use_cuda else "cpu")
-device = 'cpu'
+device = torch.device("cuda" if use_cuda else "cpu")
+
 
 def generate_attack_samples(model, cln_data, true_label):
     adversary = LinfPGDAttack(
@@ -53,8 +53,8 @@ if len(sys.argv) > 2:
     test_model_name = sys.argv[2]
     model_2_path = os.path.join('..', 'model', test_model_name)
     model_2 = torch.load(model_2_path, map_location='cpu')
-    print('testing results on '+model_2_path)
-    
+    print('testing results on ' + model_2_path)
+
 # generate attack samples
 batch_size = 100
 # dataset
@@ -104,5 +104,6 @@ defense_rate /= 900
 attack_rate /= 900
 
 with open(output_path, 'w') as f:
-    f.write('acc_before_attack %.4f | acc_after_attack %.4f | percentage_unchange %.4f percentage_successful_attack %.4f' % (
-        defense_cln_acc, defense_acc, defense_rate, attack_rate))
+    f.write(
+        'acc_before_attack %.4f | acc_after_attack %.4f | percentage_unchange %.4f percentage_successful_attack %.4f' % (
+            defense_cln_acc, defense_acc, defense_rate, attack_rate))
