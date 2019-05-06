@@ -5,7 +5,8 @@ from torch.distributions import Normal
 from torch.autograd.function import Function
 
 from models_utils import *
-
+from model_cifar_resnet18 import *
+from model_cifar_resnet18_anl import *
 
 class StepNet(nn.Module):
     def __init__(self, block, num_blocks, num_classes=10):
