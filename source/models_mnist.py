@@ -39,6 +39,9 @@ class MNISTModel(nn.Module):
 
         return x
 
+    def name(self):
+        return "LeNet_MNIST"
+
 
 class LeNet_ANL(MNISTModel):
     def __init__(self, noise_factor=None):
@@ -64,7 +67,7 @@ class LeNet_ANL(MNISTModel):
         return x
 
     def name(self):
-        return "LeNet_ANL"
+        return "LeNet_MNIST_ANL"
 
 
 class LeNet_Block(MNISTModel):
@@ -77,4 +80,4 @@ class LeNet_Block(MNISTModel):
         return super(LeNet_Block, self).forward(x)
 
     def name(self):
-        return "LeNet_Block"
+        return "LeNet_MNIST_Block"
