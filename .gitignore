@@ -1,4 +1,7 @@
 .DS_Store
 .idea
+.ipynb_checkpoints
 data
+result
 */__pycache__/*
+*/.ipynb_checkpoints/*
