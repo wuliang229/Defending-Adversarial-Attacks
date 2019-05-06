@@ -39,6 +39,8 @@ class CIFARModel(nn.Module):
 
         return x
 
+    def name(self):
+        return 'LeNet_CIFAR'
 
 class LeNet_ANL(CIFARModel):
     def __init__(self, noise_factor=None):
@@ -64,7 +66,7 @@ class LeNet_ANL(CIFARModel):
         return x
 
     def name(self):
-        return "LeNet_ANL"
+        return "LeNet_CIFAR_ANL"
 
 
 class LeNet_Block(CIFARModel):
@@ -77,4 +79,4 @@ class LeNet_Block(CIFARModel):
         return super(LeNet_Block, self).forward(x)
 
     def name(self):
-        return "LeNet_Block"
+        return "LeNet_CIFAR_Block"
