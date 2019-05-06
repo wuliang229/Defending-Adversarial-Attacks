@@ -3,7 +3,6 @@ import torch.nn as nn
 from torch.distributions import Normal
 from torch.autograd.function import Function
 
-
 class ANL(nn.Module):
     def __init__(self):
         super(ANL, self).__init__()
