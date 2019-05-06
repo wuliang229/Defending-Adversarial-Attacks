@@ -80,7 +80,7 @@ for epoch in range(20):
             loss = loss.mean()
             test_loss += loss.item()
             _, pred_label = torch.max(out.data, 1)
-            total_cnt += x.data.size()
+            total_cnt += x.data.size()[0]
             correct_cnt += torch.sum(torch.eq(pred_label, target.data)).item()
 
             if (batch_idx + 1) % 100 == 0 or (batch_idx + 1) == len(test_loader):

@@ -4,6 +4,8 @@ import torch.nn.functional as F
 from torch.distributions import Normal
 from torch.autograd.function import Function
 
+from models_utils import *
+
 
 class CIFARModel(nn.Module):
     def __init__(self):
@@ -36,3 +38,43 @@ class CIFARModel(nn.Module):
         x = self.fc3(x)
 
         return x
+
+
+class LeNet_ANL(CIFARModel):
+    def __init__(self, noise_factor=None):
+        super(LeNet_ANL, self).__init__()
+        self.anl = ANL()
+        self.noise_factor = noise_factor
+
+    def forward(self, x, noise_factor=None):
+        x = self.anl(F.relu(self.conv1(x)), self.noise_factor)
+        x = self.anl(F.relu(self.conv2(x)), self.noise_factor)
+        x = F.max_pool2d(x, 2, 2)
+        x = self.anl(F.relu(self.conv3(x)), self.noise_factor)
+        x = self.anl(F.relu(self.conv4(x)), self.noise_factor)
+        x = F.max_pool2d(x, 2, 2)
+
+        x = x.view(x.size(0), -1)  # flatten
+        x = self.anl(F.relu(self.fc1(x)), self.noise_factor)
+        x = self.dropout1(x)
+        x = self.anl(F.relu(self.fc2(x)), self.noise_factor)
+        x = self.dropout2(x)
+        x = self.fc3(x)
+
+        return x
+
+    def name(self):
+        return "LeNet_ANL"
+
+
+class LeNet_Block(CIFARModel):
+    def __init__(self):
+        super(LeNet_Block, self).__init__()
+        self.backblock = BackBlock.apply
+
+    def forward(self, x):
+        x = self.backblock(x)
+        return super(LeNet_Block, self).forward(x)
+
+    def name(self):
+        return "LeNet_Block"
