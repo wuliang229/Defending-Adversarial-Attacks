@@ -83,7 +83,7 @@ if __name__ == '__main__':
     print('==>>> total trainning batch number: {}'.format(len(train_loader)))
 
     # to 0 and 1, N == 2
-    Nsteps = 201
+    Nsteps = 501
     model = CounterFrequency(Nsteps)
     if use_cuda:
         model = model.cuda()
@@ -101,7 +101,7 @@ if __name__ == '__main__':
             one_channel = one_channel.detach().cpu().contiguous().view(-1).numpy()
             tempFrequency = Counter(one_channel)
             frequency[i] += tempFrequency
-        break
+        # break
     bar_width = 0.005
     for i in range(3):
         num_pix[i] = sum(frequency[i].values())

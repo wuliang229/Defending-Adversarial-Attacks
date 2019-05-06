@@ -65,23 +65,23 @@ class Bottleneck(nn.Module):
         out = F.relu(out)
         return out
 
-class ResNet01(nn.Module):
+class StepNet(nn.Module):
     def __init__(self, block, num_blocks, num_classes=10):
-        super(ResNet01, self).__init__()
+        super(StepNet, self).__init__()
         self.in_planes = 64
 
         models0 = []
-        thresholds = [0.155, 0.255, 0.33, 0.395, 0.465, 0.545, 0.62, 0.72, 0.835][::-1]
+        thresholds = [0.161, 0.259, 0.341, 0.416, 0.482, 0.553, 0.631, 0.718, 0.839][::-1]
         for index, threshold in enumerate(thresholds):
             models0.append(nn.Threshold(-threshold, (len(thresholds) - 1 - index) / (len(thresholds) - 1)))
 
         models1 = []
-        thresholds = [0.15, 0.25, 0.33, 0.39, 0.46, 0.53, 0.61, 0.695, 0.81][::-1]
+        thresholds = [0.161, 0.255, 0.333, 0.404, 0.475, 0.541, 0.616, 0.702, 0.824][::-1]
         for index, threshold in enumerate(thresholds):
             models1.append(nn.Threshold(-threshold, (len(thresholds) - 1 - index) / (len(thresholds) - 1)))
 
         models2 = []
-        thresholds = [0.115, 0.2, 0.275, 0.34, 0.405, 0.48, 0.575, 0.7, 0.84][::-1]
+        thresholds = [0.122, 0.2, 0.271, 0.337, 0.408, 0.49, 0.584, 0.698, 0.843][::-1]
         for index, threshold in enumerate(thresholds):
             models2.append(nn.Threshold(-threshold, (len(thresholds) - 1 - index) / (len(thresholds) - 1)))
 
@@ -122,7 +122,7 @@ class ResNet01(nn.Module):
         return out
 
     def name(self):
-        return "cifar_resnet18"
+        return "StepNet"
 
 if __name__ == '__mian__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -148,7 +148,7 @@ if __name__ == '__mian__':
     print('==>>> total testing batch number: {}'.format(len(test_loader)))
 
     # model
-    model = ResNet01(BasicBlock, [2, 2, 2, 2])
+    model = StepNet(BasicBlock, [2, 2, 2, 2])
     model = model.to(device)
 
     optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
@@ -203,4 +203,4 @@ if __name__ == '__mian__':
         if accuracy > best_accuracy:
             best_model_wts = copy.deepcopy(model.state_dict())
             best_accuracy = accuracy
-            torch.save(model, 'model' + model.name() + '.pth')
+            torch.save(model, 'cifar_stepnet.pth')
