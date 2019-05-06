@@ -25,8 +25,23 @@ class TeacherData(Dataset):
 class CIFARModel01(nn.Module):
     def __init__(self):
         super(CIFARModel01, self).__init__()
-        self.th1 = nn.Threshold(0.5, 0)
-        self.th2 = nn.Threshold(-0.5, 1)
+
+        models0 = []
+        models0.append(nn.Threshold(-0.75, 1.0))
+        models0.append(nn.Threshold(-0.2, 0.5))
+        models0.append(nn.Threshold(-0.0, 0.0))
+        models1 = []
+        models1.append(nn.Threshold(-0.75, 1.0))
+        models1.append(nn.Threshold(-0.2, 0.5))
+        models1.append(nn.Threshold(-0.0, 0.0))
+        models2 = []
+        models2.append(nn.Threshold(-0.6, 1.0))
+        models2.append(nn.Threshold(-0.1, 0.5))
+        models2.append(nn.Threshold(-0.0, 0.0))
+        self.through0 = nn.Sequential(*models0)
+        self.through1 = nn.Sequential(*models1)
+        self.through2 = nn.Sequential(*models2)
+
         self.conv1 = nn.Conv2d(3, 64, 3)
         self.conv2 = nn.Conv2d(64, 64, 3)
         self.conv3 = nn.Conv2d(64, 128, 3)
@@ -39,9 +54,12 @@ class CIFARModel01(nn.Module):
         self.fc3 = nn.Linear(256, 10)
 
     def forward(self, x):
-        x = self.th1(x)
-        x = -x
-        x = self.th2(x)
+        step = True
+        if step:
+            x = -x
+            x[:, 0, :, :] = self.through0(x[:, 0, :, :])
+            x[:, 1, :, :] = self.through1(x[:, 1, :, :])
+            x[:, 2, :, :] = self.through2(x[:, 2, :, :])
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
         x = F.max_pool2d(x, 2, 2)
