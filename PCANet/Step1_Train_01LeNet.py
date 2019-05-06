@@ -17,6 +17,8 @@ else:
 class LeNet01(nn.Module):
     def __init__(self):
         super(LeNet01, self).__init__()
+        self.th1 = nn.Threshold(0.5, 0)
+        self.th2 = nn.Threshold(-0.5, 1)
         self.conv1 = nn.Conv2d(1, 32, 3)
         self.conv2 = nn.Conv2d(32, 32, 3)
         self.conv3 = nn.Conv2d(32, 64, 3)
@@ -29,9 +31,9 @@ class LeNet01(nn.Module):
         self.fc3 = nn.Linear(200, 10)
 
     def forward(self, x):
-        zeros = torch.zeros_like(x)
-        ones = torch.ones_like(x)
-        x = torch.where(x > 0, zeros, ones)
+        x = self.th1(x)
+        x = -x
+        x = self.th2(x)
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
         x = F.max_pool2d(x, 2, 2)
@@ -59,10 +61,10 @@ if __name__ == '__main__':
     if not os.path.exists(root):
         os.mkdir(root)
 
-    trans = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (1.0,))])
+    # trans = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (1.0,))])
     # if not exist, download mnist dataset
-    train_set = dset.MNIST(root=root, train=True, transform=trans, download=True)
-    test_set = dset.MNIST(root=root, train=False, transform=trans, download=True)
+    train_set = dset.MNIST(root=root, train=True, transform=transforms.ToTensor(), download=True)
+    test_set = dset.MNIST(root=root, train=False, transform=transforms.ToTensor(), download=True)
 
     batch_size = 128
 
@@ -86,7 +88,7 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     criterion = nn.CrossEntropyLoss()
 
-    for epoch in range(20):
+    for epoch in range(5):
         # training
         model.train()
         train_loss = 0.
