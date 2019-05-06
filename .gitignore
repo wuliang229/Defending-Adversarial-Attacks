@@ -5,4 +5,5 @@ data
 result
 */.idea/*
 */__pycache__/*
+*/.idea/*
 */.ipynb_checkpoints/*
