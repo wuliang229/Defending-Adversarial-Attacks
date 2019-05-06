@@ -61,9 +61,7 @@ batch_size = 100
 root = '../data'
 if not os.path.exists(root):
     os.mkdir(root)
-# train_set = dset.MNIST(root=root, train=True, transform=transforms.ToTensor(), download=True)
 test_set = dset.MNIST(root=root, train=False, transform=transforms.ToTensor(), download=True)
-# train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=100, shuffle=True)
 test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True)
 
 for cln_data, true_label in test_loader:

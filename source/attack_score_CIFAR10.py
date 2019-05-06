@@ -18,10 +18,11 @@ use_cuda = torch.cuda.is_available()
 # device = torch.device("cuda" if use_cuda else "cpu")
 device = 'cpu'
 
+
 def generate_attack_samples(model, cln_data, true_label):
     adversary = LinfPGDAttack(
-                model, loss_fn=nn.CrossEntropyLoss(reduction="sum"), eps=0.15, eps_iter=0.01, nb_iter=10,
-    rand_init=True, targeted=False)
+        model, loss_fn=nn.CrossEntropyLoss(reduction="sum"), eps=0.15, eps_iter=0.01, nb_iter=10,
+        rand_init=True, targeted=False)
 
     adv_untargeted = adversary.perturb(cln_data, true_label)
 
@@ -51,17 +52,18 @@ if len(sys.argv) > 2:
     test_model_name = sys.argv[2]
     model_2_path = os.path.join('..', 'model', test_model_name)
     model_2 = torch.load(model_2_path, map_location='cpu')
-    print('testing results on '+model_2_path)
-    
+    print('testing results on ' + model_2_path)
+
 # generate attack samples
 batch_size = 100
 # dataset
 root = '../data'
 if not os.path.exists(root):
     os.mkdir(root)
-# train_set = dset.MNIST(root=root, train=True, transform=transforms.ToTensor(), download=True)
-test_set = dset.CIFAR10(root=root, train=False, transform=transforms.ToTensor(), download=True)
-# train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=100, shuffle=True)
+transform = transforms.Compose(
+    [transforms.ToTensor(),
+     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)), ])
+test_set = dset.CIFAR10(root=root, train=False, transform=transform, download=True)
 test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True)
 
 for cln_data, true_label in test_loader:
@@ -104,5 +106,6 @@ defense_rate /= 900
 attack_rate /= 900
 
 with open(output_path, 'w') as f:
-    f.write('acc_before_attack %.4f | acc_after_attack %.4f | percentage_unchange %.4f percentage_successful_attack %.4f' % (
-        defense_cln_acc, defense_acc, defense_rate, attack_rate))
+    f.write(
+        'acc_before_attack %.4f | acc_after_attack %.4f | percentage_unchange %.4f percentage_successful_attack %.4f' % (
+            defense_cln_acc, defense_acc, defense_rate, attack_rate))
