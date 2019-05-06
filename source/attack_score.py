@@ -12,8 +12,8 @@ from models_mnist import *
 
 torch.manual_seed(0)
 use_cuda = torch.cuda.is_available()
-device = torch.device("cuda" if use_cuda else "cpu")
-
+# device = torch.device("cuda" if use_cuda else "cpu")
+device = 'cpu'
 
 def generate_attack_samples(model, cln_data, true_label):
     adversary = LinfPGDAttack(
