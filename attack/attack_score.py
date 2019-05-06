@@ -1,14 +1,13 @@
-# <---- need to put the model defination input the models.py file ---->
+# <---- need to put the model defination input the models_mnist.py file ---->
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 from advertorch.utils import predict_from_logits
 from advertorch_examples.utils import get_mnist_test_loader
 from advertorch_examples.utils import _imshow
 from advertorch.attacks import LinfPGDAttack
 import sys
-from models import *
+from ..model.models_mnist import *
 
 torch.manual_seed(0)
 use_cuda = torch.cuda.is_available()

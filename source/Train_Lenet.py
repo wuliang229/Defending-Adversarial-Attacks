@@ -7,9 +7,7 @@ import torchvision.transforms as transforms
 import torch.optim as optim
 
 from tqdm import tqdm
-
-from model import LeNet
-
+from ..model.models_mnist import *
 use_cuda = torch.cuda.is_available()
 
 # params
@@ -30,7 +28,7 @@ print('==>>> total trainning batch number: {}'.format(len(train_loader)))
 print('==>>> total testing batch number: {}'.format(len(test_loader)))
 
 # model
-model = LeNet()
+model = MNISTModel()
 if use_cuda:
     model = model.cuda()
 

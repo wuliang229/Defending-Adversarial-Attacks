@@ -1,13 +1,14 @@
 import torch
-from torch import nn
+import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Normal
 from torch.autograd.function import Function
 
 
-class LeNet(nn.Module):
+class MNISTModel(nn.Module):
     def __init__(self):
-        super(LeNet, self).__init__()
+        super(MNISTModel, self).__init__()
+
         self.conv1 = nn.Conv2d(1, 32, 3)
         self.conv2 = nn.Conv2d(32, 32, 3)
         self.conv3 = nn.Conv2d(32, 64, 3)
@@ -32,16 +33,12 @@ class LeNet(nn.Module):
         x = self.dropout1(x)
         x = F.relu(self.fc2(x))
         x = self.dropout2(x)
-        y = x
         x = self.fc3(x)
 
-        return x, y
-
-    def name(self):
-        return "LeNet"
+        return x
 
 
-class LeNet_ANL(LeNet):
+class LeNet_ANL(MNISTModel):
     def __init__(self, noise_factor=None):
         super(LeNet_ANL, self).__init__()
         self.anl = ANL()
@@ -60,16 +57,15 @@ class LeNet_ANL(LeNet):
         x = self.dropout1(x)
         x = self.anl(F.relu(self.fc2(x)), self.noise_factor)
         x = self.dropout2(x)
-        y = x
         x = self.fc3(x)
 
-        return x, y
+        return x
 
     def name(self):
         return "LeNet_ANL"
 
 
-class LeNet_Block(LeNet):
+class LeNet_Block(MNISTModel):
     def __init__(self):
         super(LeNet_Block, self).__init__()
         self.backblock = BackBlock.apply
