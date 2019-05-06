@@ -187,13 +187,13 @@ if not os.path.isdir('models'):
     os.makedirs('models')
 
 batch_size = 128
-num_epochs = 30
+num_epochs = 50
 
 train_loader = DataLoader(dataset=CIFAR_trainset, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(dataset=CIFAR_testset, batch_size=batch_size, shuffle=False)
 
 # Regular training
-train(train_loader, "LeNet_CIFAR10.pt", 20, False)
+train(train_loader, "LeNet_CIFAR10.pt", num_epochs, False)
 
 # Distillation training
 train_distillation(train_loader, "LeNet_CIFAR10_distilled_20.pt", num_epochs, 20)
