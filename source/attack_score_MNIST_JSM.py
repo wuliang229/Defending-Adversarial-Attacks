@@ -9,7 +9,7 @@ import torchvision.transforms as transforms
 from advertorch.utils import predict_from_logits
 from advertorch_examples.utils import get_mnist_test_loader
 from advertorch_examples.utils import _imshow
-from advertorch.attacks import LinfPGDAttack
+from advertorch.attacks import JacobianSaliencyMapAttack
 import sys
 from models_mnist import *
 
