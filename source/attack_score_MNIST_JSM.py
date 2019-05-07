@@ -39,8 +39,8 @@ Privacy. IEEE, 2016.'''
     adv_targeted_results = []
     adv_target_labels = []
     avg_distortion_rate = 0.0
-    min_distortion_rate = 0.0
-    max_distortion_rate = 1.0
+    min_distortion_rate = 1.0
+    max_distortion_rate = 0.0
     loader = tqdm(range(num_classes), total=len(range(num_classes)))
     for target_label in loader:
         assert target_label >= 0 and target_label <= 10 and type(
@@ -50,13 +50,15 @@ Privacy. IEEE, 2016.'''
         # distortion rate
         distortion_rates = [1 - torch.eq(origin_sample, adv_sample).sum().float() / origin_sample.numel() for
                             origin_sample, adv_sample in zip(cln_data, adv_targeted)]
-        avg_distortion_rate += sum(distortion_rates) / len(distortion_rates)
-        min_distortion_rate = min(distortion_rates) if min_distortion_rate > min(
-            distortion_rates) else min_distortion_rate
-        max_distortion_rate = max(distortion_rates) if max_distortion_rate > max(
-            distortion_rates) else max_distortion_rate
+        
+        # filter out equal labels
+        filtered_rates = np.array(distortion_rates)[np.array(distortion_rates) != 0.0] # distortion rate == 0 if target is the same with true
+        avg_distortion_rate += sum(filtered_rates) / len(filtered_rates)
+        min_distortion_rate = min(min(filtered_rates), min_distortion_rate)
+        max_distortion_rate = max(max(filtered_rates), max_distortion_rate)
         adv_targeted_results.append(adv_targeted)
         adv_target_labels.append(target)
+
     avg_distortion_rate /= num_classes
 
     return adv_targeted_results, adv_target_labels, min_distortion_rate, max_distortion_rate, avg_distortion_rate
@@ -78,7 +80,7 @@ if len(sys.argv) > 2:
     print('testing results on ' + model_2_path)
 
 # generate attack samples
-batch_size = 32
+batch_size = 25
 # dataset
 root = '../data'
 if not os.path.exists(root):
@@ -89,16 +91,30 @@ transform = transforms.Compose(
 test_set = dset.MNIST(root=root, train=False, transform=transform, download=True)
 test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True)
 
-for cln_data, true_labels in test_loader:
-    break
-cln_data, true_labels = cln_data.to(device), true_labels.to(device)
+idx = 0
+adv_targeted_results, adv_target_labels = [], []
+min_distortion_rate, max_distortion_rate, avg_distortion_rate = 1, 0, 0
 
-if model_2 is not None:
-    adv_targeted_results, adv_target_labels, min_distortion_rate, max_distortion_rate, avg_distortion_rate = generate_attack_samples(
-        model_2, cln_data, true_labels)
-else:
-    adv_targeted_results, adv_target_labels, min_distortion_rate, max_distortion_rate, avg_distortion_rate = generate_attack_samples(
-        model, cln_data, true_labels)
+for cln_data, true_labels in test_loader:
+    if idx == 4:
+        break
+    cln_data, true_labels = cln_data.to(device), true_labels.to(device)
+    if model_2 is not None:
+        adv_targeted_results_batch, adv_target_labels_batch, min_distortion_rate_batch, max_distortion_rate_batch, avg_distortion_rate_batch = generate_attack_samples(
+            model_2, cln_data, true_labels)
+    else:
+        adv_targeted_results_batch, adv_target_labels_batch, min_distortion_rate_batch, max_distortion_rate_batch, avg_distortion_rate_batch = generate_attack_samples(
+            model, cln_data, true_labels)
+    adv_targeted_results.extend(adv_targeted_results_batch)
+    adv_target_labels.extend(adv_target_labels_batch)
+    min_distortion_rate = min(min_distortion_rate, min_distortion_rate_batch)
+    max_distortion_rate = max(max_distortion_rate, max_distortion_rate_batch)
+    avg_distortion_rate += avg_distortion_rate_batch
+
+    idx += 1
+
+adv_targeted_results /= 4 # 4 x 25 = 100
+
 
 defense_cln_acc = 0.0
 defense_acc = 0.0
