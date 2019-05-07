@@ -57,10 +57,8 @@ Privacy. IEEE, 2016.'''
         avg_distortion_rate += sum(filtered_rates) / len(filtered_rates)
         min_distortion_rate = min(min(filtered_rates), min_distortion_rate)
         max_distortion_rate = max(max(filtered_rates), max_distortion_rate)
-        adv_targeted_results.append(adv_targeted)
-        adv_target_labels.append(target)
-
-        print('with in attack gen', len(adv_targeted))
+        adv_targeted_results.extend(adv_targeted)
+        adv_target_labels.extend(target)
 
     avg_distortion_rate /= num_classes
 
@@ -106,7 +104,6 @@ for cln_data, true_labels in test_loader:
     else:
         adv_targeted_results_batch, adv_target_labels_batch, min_distortion_rate_batch, max_distortion_rate_batch, avg_distortion_rate_batch = generate_attack_samples(
             model, cln_data, true_labels)
-    print('adv target batch', len(adv_targeted_results_batch))
     adv_targeted_results.extend(adv_targeted_results_batch)
     adv_target_labels.extend(adv_target_labels_batch)
     min_distortion_rate = min(min_distortion_rate, min_distortion_rate_batch)
@@ -133,6 +130,7 @@ with torch.no_grad():
         for pred_label, adv_result, true_label in zip(pred_cln, adv_targeted_results[targeted_label], true_labels):
             if true_label == targeted_label:
                 continue
+            print(adv_result.is_cuda)
             pred_targeted_adv = predict_from_logits(model(adv_result.unsqueeze(0)))
             if pred_label == true_label:
                 defense_cln_acc += 1
