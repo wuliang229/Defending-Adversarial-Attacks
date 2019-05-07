@@ -60,6 +60,8 @@ Privacy. IEEE, 2016.'''
         adv_targeted_results.append(adv_targeted)
         adv_target_labels.append(target)
 
+        print('with in attack gen', ßlen(adv_targeted))
+
     avg_distortion_rate /= num_classes
 
     return adv_targeted_results, adv_target_labels, min_distortion_rate, max_distortion_rate, avg_distortion_rate
