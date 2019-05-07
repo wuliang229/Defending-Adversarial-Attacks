@@ -57,8 +57,8 @@ Privacy. IEEE, 2016.'''
         avg_distortion_rate += sum(filtered_rates) / len(filtered_rates)
         min_distortion_rate = min(min(filtered_rates), min_distortion_rate)
         max_distortion_rate = max(max(filtered_rates), max_distortion_rate)
-        adv_targeted_results.extend(adv_targeted)
-        adv_target_labels.extend(target)
+        adv_targeted_results.append(adv_targeted)
+        adv_target_labels.append(target)
 
     avg_distortion_rate /= num_classes
 
@@ -91,7 +91,7 @@ test_set = dset.MNIST(root=root, train=False, transform=transforms.ToTensor(), d
 test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True)
 
 idx = 0
-adv_targeted_results, adv_target_labels = [], []
+adv_targeted_results, adv_target_labels = [[] for i in range(10)], [[] for i in range(10)]
 min_distortion_rate, max_distortion_rate, avg_distortion_rate = 1, 0, 0
 
 cln_data = []
@@ -106,15 +106,17 @@ for batch_cln_data, batch_true_labels in test_loader:
 
     cln_data.append(batch_cln_data)
     true_labels.append(batch_true_labels)
-    
+
     if model_2 is not None:
         adv_targeted_results_batch, adv_target_labels_batch, min_distortion_rate_batch, max_distortion_rate_batch, avg_distortion_rate_batch = generate_attack_samples(
             model_2, batch_cln_data, batch_true_labels)
     else:
         adv_targeted_results_batch, adv_target_labels_batch, min_distortion_rate_batch, max_distortion_rate_batch, avg_distortion_rate_batch = generate_attack_samples(
             model, batch_cln_data, batch_true_labels)
-    adv_targeted_results.extend(adv_targeted_results_batch)
-    adv_target_labels.extend(adv_target_labels_batch)
+    # extend to each classes
+    for target_label in range(10):
+        adv_targeted_results[target_label].extend(adv_targeted_results_batch[target_label])
+        adv_target_labels[target_label].extend(adv_target_labels_batch[target_label])
     min_distortion_rate = min(min_distortion_rate, min_distortion_rate_batch)
     max_distortion_rate = max(max_distortion_rate, max_distortion_rate_batch)
     avg_distortion_rate += avg_distortion_rate_batch
@@ -122,15 +124,17 @@ for batch_cln_data, batch_true_labels in test_loader:
     idx += 1
 
 avg_distortion_rate /= 4 # 4 x 250 = 1000
-print(len(adv_targeted_results), adv_targeted_results[0])
+adv_targeted_results = [torch.cat(result) for result in adv_targeted_results]
+adv_target_labels = [torch.cat(label) for label in adv_target_labels]
+print(len(adv_targeted_results), adv_targeted_results[0].size(ß))
 
 defense_cln_acc = 0.0
 defense_acc = 0.0
 defense_rate = 0.0
 attack_rate = 0.0
 
-cln_data = torch.cat(cln_data, 0)
-true_labels = torch.cat(true_labels, 0)
+cln_data = torch.cat(cln_data, 0) # 100, 1, 28, 28
+true_labels = torch.cat(true_labels, 0) # 100
 
 pred_cln = predict_from_logits(model(cln_data.to(device)))
 
