@@ -94,16 +94,25 @@ idx = 0
 adv_targeted_results, adv_target_labels = [], []
 min_distortion_rate, max_distortion_rate, avg_distortion_rate = 1, 0, 0
 
-for cln_data, true_labels in test_loader:
+cln_data = []
+true_labels = []
+
+
+for batch_cln_data, batch_true_labels in test_loader:
     if idx == 4:
         break
-    cln_data, true_labels = cln_data.to(device), true_labels.to(device)
+
+    batch_cln_data, batch_true_labels = batch_cln_data.to(device), batch_true_labels.to(device)
+
+    cln_data.append(batch_cln_data)
+    true_labels.append(batch_true_labels)
+    
     if model_2 is not None:
         adv_targeted_results_batch, adv_target_labels_batch, min_distortion_rate_batch, max_distortion_rate_batch, avg_distortion_rate_batch = generate_attack_samples(
-            model_2, cln_data, true_labels)
+            model_2, batch_cln_data, batch_true_labels)
     else:
         adv_targeted_results_batch, adv_target_labels_batch, min_distortion_rate_batch, max_distortion_rate_batch, avg_distortion_rate_batch = generate_attack_samples(
-            model, cln_data, true_labels)
+            model, batch_cln_data, batch_true_labels)
     adv_targeted_results.extend(adv_targeted_results_batch)
     adv_target_labels.extend(adv_target_labels_batch)
     min_distortion_rate = min(min_distortion_rate, min_distortion_rate_batch)
@@ -120,7 +129,10 @@ defense_acc = 0.0
 defense_rate = 0.0
 attack_rate = 0.0
 
-pred_cln = predict_from_logits(model(cln_data))
+cln_data = torch.cat(cln_data, 0)
+true_labels = torch.cat(true_labels, 0)
+
+pred_cln = predict_from_logits(model(cln_data.to(device)))
 
 with torch.no_grad():
     loader = tqdm(range(len(adv_targeted_results)), total=len(range(len(adv_targeted_results))))
