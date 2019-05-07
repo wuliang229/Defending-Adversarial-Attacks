@@ -85,10 +85,8 @@ batch_size = 25
 root = '../data'
 if not os.path.exists(root):
     os.mkdir(root)
-transform = transforms.Compose(
-    [transforms.ToTensor(),
-     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)), ])
-test_set = dset.MNIST(root=root, train=False, transform=transform, download=True)
+
+test_set = dset.MNIST(root=root, train=False, transform=transforms.ToTensor(), download=True)
 test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True)
 
 idx = 0
