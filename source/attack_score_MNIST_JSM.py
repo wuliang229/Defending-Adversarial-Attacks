@@ -106,6 +106,7 @@ for cln_data, true_labels in test_loader:
     else:
         adv_targeted_results_batch, adv_target_labels_batch, min_distortion_rate_batch, max_distortion_rate_batch, avg_distortion_rate_batch = generate_attack_samples(
             model, cln_data, true_labels)
+    print('adv target batch', len(adv_targeted_results_batch))
     adv_targeted_results.extend(adv_targeted_results_batch)
     adv_target_labels.extend(adv_target_labels_batch)
     min_distortion_rate = min(min_distortion_rate, min_distortion_rate_batch)
@@ -114,8 +115,8 @@ for cln_data, true_labels in test_loader:
 
     idx += 1
 
-avg_distortion_rate /= 4 # 4 x 25 = 100
-print(len(adv_targeted_results))
+avg_distortion_rate /= 4 # 4 x 250 = 1000
+print(len(adv_targeted_results), adv_targeted_results[0])
 
 defense_cln_acc = 0.0
 defense_acc = 0.0
