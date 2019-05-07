@@ -112,8 +112,8 @@ for cln_data, true_labels in test_loader:
 
     idx += 1
 
-adv_targeted_results /= 4 # 4 x 25 = 100
-
+avg_distortion_rate /= 4 # 4 x 25 = 100
+print(len(adv_targeted_results))
 
 defense_cln_acc = 0.0
 defense_acc = 0.0
