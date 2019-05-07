@@ -124,9 +124,12 @@ for batch_cln_data, batch_true_labels in test_loader:
     idx += 1
 
 avg_distortion_rate /= 4 # 4 x 250 = 1000
+print(adv_targeted_results)
+print(len(adv_targeted_results), adv_targeted_results[0].size())
+
 adv_targeted_results = [torch.cat(result) for result in adv_targeted_results]
 adv_target_labels = [torch.cat(label) for label in adv_target_labels]
-print(len(adv_targeted_results), adv_targeted_results[0].size(ß))
+print(len(adv_targeted_results), adv_targeted_results[0].size())
 
 defense_cln_acc = 0.0
 defense_acc = 0.0
