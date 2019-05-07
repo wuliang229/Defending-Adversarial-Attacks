@@ -99,7 +99,7 @@ true_labels = []
 
 
 for batch_cln_data, batch_true_labels in test_loader:
-    if idx == 4:
+    if idx == 2:
         break
 
     batch_cln_data, batch_true_labels = batch_cln_data.to(device), batch_true_labels.to(device)
