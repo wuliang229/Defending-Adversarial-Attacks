@@ -81,7 +81,7 @@ if len(sys.argv) > 2:
     print('testing results on ' + model_2_path)
 
 # generate attack samples
-batch_size = 25
+batch_size = 50
 # dataset
 root = '../data'
 if not os.path.exists(root):
@@ -93,36 +93,52 @@ test_set = dset.CIFAR10(root=root, train=False, transform=transform, download=Tr
 test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True)
 
 idx = 0
-adv_targeted_results, adv_target_labels = [], []
+adv_targeted_results, adv_target_labels = [[] for i in range(10)], [[] for i in range(10)]
 min_distortion_rate, max_distortion_rate, avg_distortion_rate = 1, 0, 0
 
-for cln_data, true_labels in test_loader:
-    if idx == 4:
+cln_data = []
+true_labels = []
+
+
+for batch_cln_data, batch_true_labels in test_loader:
+    if idx == 2:
         break
-    cln_data, true_labels = cln_data.to(device), true_labels.to(device)
+
+    batch_cln_data, batch_true_labels = batch_cln_data.to(device), batch_true_labels.to(device)
+
+    cln_data.append(batch_cln_data)
+    true_labels.append(batch_true_labels)
+
     if model_2 is not None:
         adv_targeted_results_batch, adv_target_labels_batch, min_distortion_rate_batch, max_distortion_rate_batch, avg_distortion_rate_batch = generate_attack_samples(
-            model_2, cln_data, true_labels)
+            model_2, batch_cln_data, batch_true_labels)
     else:
         adv_targeted_results_batch, adv_target_labels_batch, min_distortion_rate_batch, max_distortion_rate_batch, avg_distortion_rate_batch = generate_attack_samples(
-            model, cln_data, true_labels)
-    adv_targeted_results.extend(adv_targeted_results_batch)
-    adv_target_labels.extend(adv_target_labels_batch)
+            model, batch_cln_data, batch_true_labels)
+    # extend to each classes
+    for target_label in range(10):
+        adv_targeted_results[target_label].extend(adv_targeted_results_batch[target_label].unsqueeze(0))
+        adv_target_labels[target_label].extend(adv_target_labels_batch[target_label].unsqueeze(0))
     min_distortion_rate = min(min_distortion_rate, min_distortion_rate_batch)
     max_distortion_rate = max(max_distortion_rate, max_distortion_rate_batch)
     avg_distortion_rate += avg_distortion_rate_batch
 
     idx += 1
 
-avg_distortion_rate /= 4 # 4 x 25 = 100
+avg_distortion_rate /= 4 # 4 x 250 = 1000
 
+adv_targeted_results = [torch.cat(result) for result in adv_targeted_results]
+adv_target_labels = [torch.cat(label) for label in adv_target_labels]
 
 defense_cln_acc = 0.0
 defense_acc = 0.0
 defense_rate = 0.0
 attack_rate = 0.0
 
-pred_cln = predict_from_logits(model(cln_data))
+cln_data = torch.cat(cln_data, 0) # 100, 1, 28, 28
+true_labels = torch.cat(true_labels, 0) # 100
+
+pred_cln = predict_from_logits(model(cln_data.to(device)))
 
 with torch.no_grad():
     loader = tqdm(range(len(adv_targeted_results)), total=len(range(len(adv_targeted_results))))

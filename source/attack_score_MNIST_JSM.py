@@ -81,7 +81,7 @@ if len(sys.argv) > 2:
     print('testing results on ' + model_2_path)
 
 # generate attack samples
-batch_size = 25
+batch_size = 50
 # dataset
 root = '../data'
 if not os.path.exists(root):
@@ -115,8 +115,8 @@ for batch_cln_data, batch_true_labels in test_loader:
             model, batch_cln_data, batch_true_labels)
     # extend to each classes
     for target_label in range(10):
-        adv_targeted_results[target_label].extend(adv_targeted_results_batch[target_label])
-        adv_target_labels[target_label].extend(adv_target_labels_batch[target_label])
+        adv_targeted_results[target_label].extend(adv_targeted_results_batch[target_label].unsqueeze(0))
+        adv_target_labels[target_label].extend(adv_target_labels_batch[target_label].unsqueeze(0))
     min_distortion_rate = min(min_distortion_rate, min_distortion_rate_batch)
     max_distortion_rate = max(max_distortion_rate, max_distortion_rate_batch)
     avg_distortion_rate += avg_distortion_rate_batch
@@ -124,12 +124,9 @@ for batch_cln_data, batch_true_labels in test_loader:
     idx += 1
 
 avg_distortion_rate /= 4 # 4 x 250 = 1000
-print(adv_targeted_results)
-print(len(adv_targeted_results), adv_targeted_results[0].size())
 
 adv_targeted_results = [torch.cat(result) for result in adv_targeted_results]
 adv_target_labels = [torch.cat(label) for label in adv_target_labels]
-print(len(adv_targeted_results), adv_targeted_results[0].size())
 
 defense_cln_acc = 0.0
 defense_acc = 0.0
@@ -149,7 +146,6 @@ with torch.no_grad():
         for pred_label, adv_result, true_label in zip(pred_cln, adv_targeted_results[targeted_label], true_labels):
             if true_label == targeted_label:
                 continue
-            print(adv_result.is_cuda)
             pred_targeted_adv = predict_from_logits(model(adv_result.unsqueeze(0)))
             if pred_label == true_label:
                 defense_cln_acc += 1
