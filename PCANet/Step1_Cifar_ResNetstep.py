@@ -8,9 +8,9 @@ import torch.optim as optim
 import torch
 from torch.autograd.function import Function
 import torch.nn as nn
+from tqdm import tqdm
 import torch.nn.functional as F
 from torch.distributions import Normal
-from tqdm import tqdm
 
 
 class BasicBlock(nn.Module):
@@ -71,17 +71,17 @@ class StepNet(nn.Module):
         self.in_planes = 64
 
         models0 = []
-        thresholds = [0.161, 0.259, 0.341, 0.416, 0.482, 0.553, 0.631, 0.718, 0.839][::-1]
+        thresholds = [0.0, 0.161, 0.259, 0.341, 0.416, 0.482, 0.553, 0.631, 0.718, 0.839][::-1]
         for index, threshold in enumerate(thresholds):
             models0.append(nn.Threshold(-threshold, (len(thresholds) - 1 - index) / (len(thresholds) - 1)))
 
         models1 = []
-        thresholds = [0.161, 0.255, 0.333, 0.404, 0.475, 0.541, 0.616, 0.702, 0.824][::-1]
+        thresholds = [0.0, 0.161, 0.255, 0.333, 0.404, 0.475, 0.541, 0.616, 0.702, 0.824][::-1]
         for index, threshold in enumerate(thresholds):
             models1.append(nn.Threshold(-threshold, (len(thresholds) - 1 - index) / (len(thresholds) - 1)))
 
         models2 = []
-        thresholds = [0.122, 0.2, 0.271, 0.337, 0.408, 0.49, 0.584, 0.698, 0.843][::-1]
+        thresholds = [0.0, 0.122, 0.2, 0.271, 0.337, 0.408, 0.49, 0.584, 0.698, 0.843][::-1]
         for index, threshold in enumerate(thresholds):
             models2.append(nn.Threshold(-threshold, (len(thresholds) - 1 - index) / (len(thresholds) - 1)))
 
@@ -106,11 +106,13 @@ class StepNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        # print(x[0][0][0])
         x = -x
-        x[:, 0, :, :] = self.through0(x[:, 0, :, :])
-        x[:, 1, :, :] = self.through1(x[:, 1, :, :])
-        x[:, 2, :, :] = self.through2(x[:, 2, :, :])
-
+        x = self.through0(x)
+        # x[:, 0, :, :] = self.through0(x[:, 0, :, :])
+        # x[:, 1, :, :] = self.through1(x[:, 1, :, :])
+        # x[:, 2, :, :] = self.through2(x[:, 2, :, :])
+        # print(x[0][0][0])
         out = F.relu(self.bn1(self.conv1(x)))
         out = self.layer1(out)
         out = self.layer2(out)
@@ -139,7 +141,8 @@ if __name__ == '__main__':
         os.mkdir(root)
     transform = transforms.Compose(
         [transforms.ToTensor(),
-         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)), ])
+         # transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+         ])
     train_set = dset.CIFAR10(root=root, train=True, transform=transform, download=True)
     test_set = dset.CIFAR10(root=root, train=False, transform=transform, download=True)
     train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True)
